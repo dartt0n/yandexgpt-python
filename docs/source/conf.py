@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath("../.."))
 project = "YandexGPT Python"
 copyright = "2024, ALL SEE LLC"
 author = "ALL SEE LLC"
-release = "0.2.4"
+release = "0.2.5"
 
 # -- General configuration ---------------------------------------------------
 extensions = [

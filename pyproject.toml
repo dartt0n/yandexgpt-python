@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "yandex_gpt"
+version = "0.2.5"
+description = "A Python SDK for interacting with the YandexGPT API."
+readme = "README.md"
+license = "MIT"
+authors = [
+    "ALL SEE LLC <info@allsee.team>",
+    "Anton Kudryavtsev <dartt0n@ya.ru>",
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+]
+homepage = "https://github.com/allseeteam/yandexgpt-python"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = "^3.7.2"
+requests = "^2.31.0"
+pyjwt = { extras = ["crypto"], version = "^2.10.0" }
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

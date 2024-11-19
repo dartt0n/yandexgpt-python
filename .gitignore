@@ -1,6 +1,9 @@
 # Venv
 venv
 
+# Build artifacts
+dist
+
 # IDE Settings
 .idea
 
