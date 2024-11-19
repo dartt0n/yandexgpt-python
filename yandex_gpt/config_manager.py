@@ -8,7 +8,14 @@ import requests
 
 
 # List of available YaGPT models to use (May be needs to be moved to config file in the future)
-available_models: List[str] = ["yandexgpt", "yandexgpt-lite", "summarization"]
+available_models: List[str] = [
+    "yandexgpt",
+    "yandexgpt-lite",
+    "yandexgpt/rc",
+    "yandexgpt-32k/rc",
+    "yandexgpt-lite/rc",
+    "summarization",
+]
 
 
 class YandexGPTConfigManagerBase:
@@ -127,7 +134,7 @@ class YandexGPTConfigManagerBase:
 
         # Checking if model_type and catalog_id are set and returning the model type URI field string
         if self.model_type and self.catalog_id:
-            return f"gpt://{self.catalog_id}/{self.model_type}/latest"
+            return f"gpt://{self.catalog_id}/{self.model_type}"
         else:
             raise ValueError("Model type or catalog ID is not set")
 
