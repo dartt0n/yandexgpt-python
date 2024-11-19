@@ -25,10 +25,11 @@ class YandexGPTThread(YandexGPT):
     status : YandexGPTThreadStatus
         Current status and last error information of the thread.
     """
+
     def __init__(
-            self,
-            config_manager: Union[YandexGPTConfigManagerBase, Dict[str, Any]],
-            messages: Optional[List[YandexGPTMessage]] = None,
+        self,
+        config_manager: Union[YandexGPTConfigManagerBase, Dict[str, Any]],
+        messages: Optional[List[YandexGPTMessage]] = None,
     ) -> None:
         """
         Initializes a new instance of the YandexGPTThread.
@@ -47,16 +48,9 @@ class YandexGPTThread(YandexGPT):
         else:
             self.messages = []
 
-        self.status = YandexGPTThreadStatus(
-            status="created",
-            last_error_message=None
-        )
+        self.status = YandexGPTThreadStatus(status="created", last_error_message=None)
 
-    def add_message(
-            self,
-            role: str,
-            text: str
-    ) -> None:
+    def add_message(self, role: str, text: str) -> None:
         """
         Appends a new message to the conversation thread.
 
@@ -97,12 +91,12 @@ class YandexGPTThread(YandexGPT):
         return len(self.messages)
 
     async def run_async(
-            self,
-            temperature: float = 0.6,
-            max_tokens: int = 1000,
-            stream: bool = False,
-            completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completionAsync",
-            timeout: int = 15
+        self,
+        temperature: float = 0.6,
+        max_tokens: int = 1000,
+        stream: bool = False,
+        completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completionAsync",
+        timeout: int = 15,
     ):
         """
         Runs the thread asynchronously, requesting and appending completion from the Yandex GPT model.
@@ -137,7 +131,7 @@ class YandexGPTThread(YandexGPT):
                     max_tokens=max_tokens,
                     stream=stream,
                     completion_url=completion_url,
-                    timeout=timeout
+                    timeout=timeout,
                 )
                 self.add_message(role="assistant", text=completion_text)
             except Exception as e:
@@ -147,11 +141,11 @@ class YandexGPTThread(YandexGPT):
                 self.status["status"] = "idle"
 
     def run_sync(
-            self,
-            temperature: float = 0.6,
-            max_tokens: int = 1000,
-            stream: bool = False,
-            completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+        self,
+        temperature: float = 0.6,
+        max_tokens: int = 1000,
+        stream: bool = False,
+        completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
     ):
         """
         Runs the thread synchronously, requesting and appending completion from the Yandex GPT model.
@@ -183,7 +177,7 @@ class YandexGPTThread(YandexGPT):
                     temperature=temperature,
                     max_tokens=max_tokens,
                     stream=stream,
-                    completion_url=completion_url
+                    completion_url=completion_url,
                 )
                 self.add_message(role="assistant", text=completion_text)
             except Exception as e:

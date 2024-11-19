@@ -1,11 +1,5 @@
 import asyncio
-from typing import (
-    Dict,
-    Any,
-    TypedDict,
-    List,
-    Union
-)
+from typing import Dict, Any, TypedDict, List, Union
 
 import aiohttp
 import requests
@@ -32,11 +26,12 @@ class YandexGPTBase:
     send_sync_completion_request(headers: Dict[str, str], payload: Dict[str, Any], completion_url: str) -> Dict[str, Any]
         Sends a synchronous request to the Yandex GPT completion API.
     """
+
     @staticmethod
     async def send_async_completion_request(
-            headers: Dict[str, str],
-            payload: Dict[str, Any],
-            completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completionAsync"
+        headers: Dict[str, str],
+        payload: Dict[str, Any],
+        completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completionAsync",
     ) -> str:
         """
         Sends an asynchronous request to the Yandex GPT completion API.
@@ -57,21 +52,25 @@ class YandexGPTBase:
         """
         # Making the request
         async with aiohttp.ClientSession() as session:
-            async with session.post(completion_url, headers=headers, json=payload) as resp:
+            async with session.post(
+                completion_url, headers=headers, json=payload
+            ) as resp:
                 # If the request was successful, return the ID of the completion operation
                 # Otherwise, raise an exception
                 if resp.status == 200:
                     data = await resp.json()
-                    return data['id']
+                    return data["id"]
                 else:
-                    raise Exception(f"Failed to send async request, status code: {resp.status}")
+                    raise Exception(
+                        f"Failed to send async request, status code: {resp.status}"
+                    )
 
     @staticmethod
     async def poll_async_completion(
-            operation_id: str,
-            headers: Dict[str, str],
-            timeout: int = 5,
-            poll_url: str = 'https://llm.api.cloud.yandex.net/operations/'
+        operation_id: str,
+        headers: Dict[str, str],
+        timeout: int = 5,
+        poll_url: str = "https://llm.api.cloud.yandex.net/operations/",
     ) -> Dict[str, Any]:
         """
         Polls the status of an asynchronous completion operation until it completes or times out.
@@ -100,22 +99,26 @@ class YandexGPTBase:
                 if asyncio.get_event_loop().time() > end_time:
                     raise TimeoutError(f"Operation timed out after {timeout} seconds")
                 # Polling the operation
-                async with session.get(f"{poll_url}{operation_id}", headers=headers) as resp:
+                async with session.get(
+                    f"{poll_url}{operation_id}", headers=headers
+                ) as resp:
                     # If the request was successful, return the completion result
                     # Otherwise, raise an exception
                     if resp.status == 200:
                         data = await resp.json()
-                        if data.get('done', False):
+                        if data.get("done", False):
                             return data
                     else:
-                        raise Exception(f"Failed to poll operation status, status code: {resp.status}")
+                        raise Exception(
+                            f"Failed to poll operation status, status code: {resp.status}"
+                        )
                 await asyncio.sleep(1)
 
     @staticmethod
     def send_sync_completion_request(
-            headers: Dict[str, str],
-            payload: Dict[str, Any],
-            completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+        headers: Dict[str, str],
+        payload: Dict[str, Any],
+        completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
     ) -> Dict[str, Any]:
         """
         Sends a synchronous request to the Yandex GPT completion API.
@@ -141,7 +144,9 @@ class YandexGPTBase:
         if response.status_code == 200:
             return response.json()
         else:
-            raise Exception(f"Failed to send sync request, status code: {response.status_code}")
+            raise Exception(
+                f"Failed to send sync request, status code: {response.status_code}"
+            )
 
 
 class YandexGPT(YandexGPTBase):
@@ -156,9 +161,9 @@ class YandexGPT(YandexGPTBase):
     get_sync_completion(messages, temperature, max_tokens, stream, completion_url) -> str
         Synchronously sends a completion request to the Yandex GPT API and returns the completion result.
     """
+
     def __init__(
-            self,
-            config_manager: Union[YandexGPTConfigManagerBase, Dict[str, Any]]
+        self, config_manager: Union[YandexGPTConfigManagerBase, Dict[str, Any]]
     ) -> None:
         """
         Initializes the YandexGPT class with a configuration manager.
@@ -186,15 +191,15 @@ class YandexGPT(YandexGPTBase):
         return {
             "Content-Type": "application/json",
             "Authorization": self.config_manager.completion_request_authorization_field,
-            "x-folder-id": self.config_manager.completion_request_catalog_id_field
+            "x-folder-id": self.config_manager.completion_request_catalog_id_field,
         }
 
     def _create_completion_request_payload(
-            self,
-            messages: Union[List[YandexGPTMessage], List[Dict[str, str]]],
-            temperature: float = 0.6,
-            max_tokens: int = 1000,
-            stream: bool = False
+        self,
+        messages: Union[List[YandexGPTMessage], List[Dict[str, str]]],
+        temperature: float = 0.6,
+        max_tokens: int = 1000,
+        stream: bool = False,
     ) -> Dict[str, Any]:
         """
         Creates the payload for sending a completion request.
@@ -220,19 +225,19 @@ class YandexGPT(YandexGPTBase):
             "completionOptions": {
                 "stream": stream,
                 "temperature": temperature,
-                "maxTokens": max_tokens
+                "maxTokens": max_tokens,
             },
-            "messages": messages
+            "messages": messages,
         }
 
     async def get_async_completion(
-            self,
-            messages: Union[List[YandexGPTMessage], List[Dict[str, str]]],
-            temperature: float = 0.6,
-            max_tokens: int = 1000,
-            stream: bool = False,
-            completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completionAsync",
-            timeout: int = 5
+        self,
+        messages: Union[List[YandexGPTMessage], List[Dict[str, str]]],
+        temperature: float = 0.6,
+        max_tokens: int = 1000,
+        stream: bool = False,
+        completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completionAsync",
+        timeout: int = 5,
     ) -> str:
         """
         Sends an asynchronous completion request to the Yandex GPT API and polls for the result.
@@ -268,36 +273,32 @@ class YandexGPT(YandexGPTBase):
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
-            stream=stream
+            stream=stream,
         )
 
         completion_request_id: str = await self.send_async_completion_request(
-            headers=headers,
-            payload=payload,
-            completion_url=completion_url
+            headers=headers, payload=payload, completion_url=completion_url
         )
 
         # Polling the completion operation
         completion_response: Dict[str, Any] = await self.poll_async_completion(
-            operation_id=completion_request_id,
-            headers=headers,
-            timeout=timeout
+            operation_id=completion_request_id, headers=headers, timeout=timeout
         )
 
         # If the request was successful, return the completion result
         # Otherwise, raise an exception
-        if completion_response.get('error', None):
+        if completion_response.get("error", None):
             raise Exception(f"Failed to get completion: {completion_response['error']}")
         else:
-            return completion_response['response']['alternatives'][0]['message']['text']
+            return completion_response["response"]["alternatives"][0]["message"]["text"]
 
     def get_sync_completion(
-            self,
-            messages: Union[List[YandexGPTMessage], List[Dict[str, str]]],
-            temperature: float = 0.6,
-            max_tokens: int = 1000,
-            stream: bool = False,
-            completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        self,
+        messages: Union[List[YandexGPTMessage], List[Dict[str, str]]],
+        temperature: float = 0.6,
+        max_tokens: int = 1000,
+        stream: bool = False,
+        completion_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
     ):
         """
         Sends a synchronous completion request to the Yandex GPT API and returns the result.
@@ -331,18 +332,16 @@ class YandexGPT(YandexGPTBase):
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
-            stream=stream
+            stream=stream,
         )
 
         completion_response: Dict[str, Any] = self.send_sync_completion_request(
-            headers=headers,
-            payload=payload,
-            completion_url=completion_url
+            headers=headers, payload=payload, completion_url=completion_url
         )
 
         # If the request was successful, return the completion result
         # Otherwise, raise an exception
-        if completion_response.get('error', None):
+        if completion_response.get("error", None):
             raise Exception(f"Failed to get completion: {completion_response['error']}")
         else:
-            return completion_response['result']['alternatives'][0]['message']['text']
+            return completion_response["result"]["alternatives"][0]["message"]["text"]

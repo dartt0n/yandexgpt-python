@@ -1,21 +1,14 @@
 import base64
 import os
 import time
-from typing import (
-    Optional,
-    List, Dict, Any
-)
+from typing import Optional, List, Dict, Any
 
 import jwt
 import requests
 
 
 # List of available YaGPT models to use (May be needs to be moved to config file in the future)
-available_models: List[str] = [
-        "yandexgpt",
-        "yandexgpt-lite",
-        "summarization"
-    ]
+available_models: List[str] = ["yandexgpt", "yandexgpt-lite", "summarization"]
 
 
 class YandexGPTConfigManagerBase:
@@ -37,12 +30,13 @@ class YandexGPTConfigManagerBase:
         The API key for authorization. More details on getting an API key can be found here:
         https://yandex.cloud/ru/docs/iam/operations/api-key/create
     """
+
     def __init__(
-            self,
-            model_type: Optional[str] = None,
-            catalog_id: Optional[str] = None,
-            iam_token: Optional[str] = None,
-            api_key: Optional[str] = None,
+        self,
+        model_type: Optional[str] = None,
+        catalog_id: Optional[str] = None,
+        iam_token: Optional[str] = None,
+        api_key: Optional[str] = None,
     ) -> None:
         """
         Initializes a new instance of the YandexGPTConfigManagerBase class.
@@ -127,7 +121,9 @@ class YandexGPTConfigManagerBase:
 
         # Checking if model_type is in available_models
         if self.model_type not in available_models:
-            raise ValueError(f"Model type {self.model_type} is not supported. Supported values: {available_models}")
+            raise ValueError(
+                f"Model type {self.model_type} is not supported. Supported values: {available_models}"
+            )
 
         # Checking if model_type and catalog_id are set and returning the model type URI field string
         if self.model_type and self.catalog_id:
@@ -153,11 +149,12 @@ class YandexGPTConfigManagerForAPIKey(YandexGPTConfigManagerBase):
         The API key for authorization. More details on obtaining an API key can be found here:
         https://yandex.cloud/ru/docs/iam/operations/api-key/create
     """
+
     def __init__(
-            self,
-            model_type: Optional[str] = None,
-            catalog_id: Optional[str] = None,
-            api_key: Optional[str] = None,
+        self,
+        model_type: Optional[str] = None,
+        catalog_id: Optional[str] = None,
+        api_key: Optional[str] = None,
     ) -> None:
         """
         Initializes a new instance of the YandexGPTConfigManagerForAPIKey class.
@@ -172,11 +169,7 @@ class YandexGPTConfigManagerForAPIKey(YandexGPTConfigManagerBase):
             API key for authorization.
         """
         # Setting model type, catalog ID and API key from the constructor
-        super().__init__(
-            model_type=model_type,
-            catalog_id=catalog_id,
-            api_key=api_key
-        )
+        super().__init__(model_type=model_type, catalog_id=catalog_id, api_key=api_key)
 
         # Setting model type, catalog ID and API key from the environment variables if they are set
         self._set_config_from_env_vars()
@@ -235,11 +228,12 @@ class YandexGPTConfigManagerForIAMToken(YandexGPTConfigManagerBase):
         The IAM token for authorization. Details on obtaining an IAM token can be found here:
         https://yandex.cloud/ru/docs/iam/operations/iam-token/create-for-sa
     """
+
     def __init__(
-            self,
-            model_type: Optional[str] = None,
-            catalog_id: Optional[str] = None,
-            iam_token: Optional[str] = None,
+        self,
+        model_type: Optional[str] = None,
+        catalog_id: Optional[str] = None,
+        iam_token: Optional[str] = None,
     ) -> None:
         """
         Initializes a new instance of the YandexGPTConfigManagerForIAMToken class.
@@ -255,9 +249,7 @@ class YandexGPTConfigManagerForIAMToken(YandexGPTConfigManagerBase):
         """
         # Setting model type, catalog ID and IAM token from the constructor
         super().__init__(
-            model_type=model_type,
-            catalog_id=catalog_id,
-            iam_token=iam_token
+            model_type=model_type, catalog_id=catalog_id, iam_token=iam_token
         )
 
         # Setting model type, catalog ID and IAM token using one of options
@@ -295,15 +287,31 @@ class YandexGPTConfigManagerForIAMToken(YandexGPTConfigManagerBase):
         Generates and sets IAM token from environment variables if not provided.
         """
         # Getting environment variables
-        iam_url: str = os.getenv("YANDEX_GPT_IAM_URL", "https://iam.api.cloud.yandex.net/iam/v1/tokens")
-        service_account_id: Optional[str] = os.getenv("YANDEX_GPT_SERVICE_ACCOUNT_ID", None)
-        service_account_key_id: Optional[str] = os.getenv("YANDEX_GPT_SERVICE_ACCOUNT_KEY_ID", None)
+        iam_url: str = os.getenv(
+            "YANDEX_GPT_IAM_URL", "https://iam.api.cloud.yandex.net/iam/v1/tokens"
+        )
+        service_account_id: Optional[str] = os.getenv(
+            "YANDEX_GPT_SERVICE_ACCOUNT_ID", None
+        )
+        service_account_key_id: Optional[str] = os.getenv(
+            "YANDEX_GPT_SERVICE_ACCOUNT_KEY_ID", None
+        )
         catalog_id: Optional[str] = os.getenv("YANDEX_GPT_CATALOG_ID", None)
         private_key: Optional[str] = os.getenv("YANDEX_GPT_PRIVATE_KEY", None)
 
         # Checking environment variables
-        if not all([iam_url, service_account_id, service_account_key_id, catalog_id, private_key]):
-            raise ValueError("One or more environment variables for IAM token generation are missing.")
+        if not all(
+            [
+                iam_url,
+                service_account_id,
+                service_account_key_id,
+                catalog_id,
+                private_key,
+            ]
+        ):
+            raise ValueError(
+                "One or more environment variables for IAM token generation are missing."
+            )
 
         # Generating JWT token
         jwt_token: str = self._generate_jwt_token(
@@ -318,10 +326,10 @@ class YandexGPTConfigManagerForIAMToken(YandexGPTConfigManagerBase):
 
     @staticmethod
     def _generate_jwt_token(
-            service_account_id: str,
-            private_key: str,
-            key_id: str,
-            url: str = "https://iam.api.cloud.yandex.net/iam/v1/tokens",
+        service_account_id: str,
+        private_key: str,
+        key_id: str,
+        url: str = "https://iam.api.cloud.yandex.net/iam/v1/tokens",
     ) -> str:
         """
         Generates and swaps a JWT token to an IAM token.
@@ -351,16 +359,13 @@ class YandexGPTConfigManagerForIAMToken(YandexGPTConfigManagerBase):
             "exp": now + 360,
         }
         encoded_token: str = jwt.encode(
-            payload,
-            private_key,
-            algorithm="PS256",
-            headers={"kid": key_id}
+            payload, private_key, algorithm="PS256", headers={"kid": key_id}
         )
         return encoded_token
 
     @staticmethod
     def _swap_jwt_to_iam(
-            jwt_token: str, url: str = "https://iam.api.cloud.yandex.net/iam/v1/tokens"
+        jwt_token: str, url: str = "https://iam.api.cloud.yandex.net/iam/v1/tokens"
     ) -> str:
         """
         Swaps a JWT token for an IAM token by making a POST request to the Yandex IAM service.
@@ -385,17 +390,15 @@ class YandexGPTConfigManagerForIAMToken(YandexGPTConfigManagerBase):
         headers: Dict[str, str] = {"Content-Type": "application/json"}
         data: Dict[str, str] = {"jwt": jwt_token}
         # Swapping JWT token to IAM
-        response: requests.Response = requests.post(
-            url,
-            headers=headers,
-            json=data
-        )
+        response: requests.Response = requests.post(url, headers=headers, json=data)
         if response.status_code == 200:
             # If succeeded to get IAM token return it
             return response.json()["iamToken"]
         else:
             # If failed to get IAM token raise an exception
-            raise Exception(f"Failed to get IAM token. Status code: {response.status_code}\n{response.text}")
+            raise Exception(
+                f"Failed to get IAM token. Status code: {response.status_code}\n{response.text}"
+            )
 
     def _check_config(self) -> None:
         """
@@ -428,6 +431,7 @@ class YandexGPTConfigManagerForIAMTokenWithBase64Key(YandexGPTConfigManagerForIA
 
     Inherits attributes from YandexGPTConfigManagerForIAMToken.
     """
+
     def _set_iam_from_env_config_and_private_key(self) -> None:
         """
         Overrides the base method to generate and set the IAM token using a base64-encoded private key from
@@ -439,15 +443,33 @@ class YandexGPTConfigManagerForIAMTokenWithBase64Key(YandexGPTConfigManagerForIA
             If any required environment variables are missing.
         """
         # Getting environment variables
-        iam_url: str = os.getenv("YANDEX_GPT_IAM_URL", "https://iam.api.cloud.yandex.net/iam/v1/tokens")
-        service_account_id: Optional[str] = os.getenv("YANDEX_GPT_SERVICE_ACCOUNT_ID", None)
-        service_account_key_id: Optional[str] = os.getenv("YANDEX_GPT_SERVICE_ACCOUNT_KEY_ID", None)
+        iam_url: str = os.getenv(
+            "YANDEX_GPT_IAM_URL", "https://iam.api.cloud.yandex.net/iam/v1/tokens"
+        )
+        service_account_id: Optional[str] = os.getenv(
+            "YANDEX_GPT_SERVICE_ACCOUNT_ID", None
+        )
+        service_account_key_id: Optional[str] = os.getenv(
+            "YANDEX_GPT_SERVICE_ACCOUNT_KEY_ID", None
+        )
         catalog_id: Optional[str] = os.getenv("YANDEX_GPT_CATALOG_ID", None)
-        private_key_base64: Optional[str] = os.getenv("YANDEX_GPT_PRIVATE_KEY_BASE64", None)
+        private_key_base64: Optional[str] = os.getenv(
+            "YANDEX_GPT_PRIVATE_KEY_BASE64", None
+        )
 
         # Checking environment variables
-        if not all([iam_url, service_account_id, service_account_key_id, catalog_id, private_key_base64]):
-            raise ValueError("One or more environment variables for IAM token generation are missing.")
+        if not all(
+            [
+                iam_url,
+                service_account_id,
+                service_account_key_id,
+                catalog_id,
+                private_key_base64,
+            ]
+        ):
+            raise ValueError(
+                "One or more environment variables for IAM token generation are missing."
+            )
 
         # Decoding private key
         private_key_bytes: bytes = base64.b64decode(private_key_base64)
